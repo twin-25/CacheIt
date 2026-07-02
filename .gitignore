@@ -1,0 +1,24 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.Python
+
+# Environment
+.env
+
+# Docker
+*.log
+
+# VS Code
+.vscode/
+
+# Models (HuggingFace downloads locally, can be large)
+models/
+*.bin
+*.safetensors
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,6 @@
+from decouple import config
+
+ANTHROPIC_API_KEY = config("ANTHROPIC_API_KEY")
+REDIS_URL = config("REDIS_URL")
+SIMILARITY_THRESHOLD = config("SIMILARITY_THRESHOLD", cast=float)
+EMBEDDING_MODEL = config("EMBEDDING_MODEL")
