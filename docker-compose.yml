@@ -17,6 +17,8 @@ services:
       - "8001:8001"
     volumes:
       - redis_data:/data
+    environment: 
+      - REDIS_ARGS=--save 60 1 --appendonly yes
 
 volumes:
   redis_data:
