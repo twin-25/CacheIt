@@ -155,4 +155,3 @@ CacheIt is part of a two-phase AI engineering portfolio:
 ## Built By
 
 Jaya Sankar Sailesh — AI/Software Engineer  
-[GitHub](https://github.com/yourusername) · [LinkedIn](https://linkedin.com/in/yourusername)
