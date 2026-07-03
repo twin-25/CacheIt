@@ -4,3 +4,4 @@ httpx
 python-decouple
 sentence-transformers
 redisvl
+anthropic
