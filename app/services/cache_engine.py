@@ -79,10 +79,11 @@ def search_cache(session_id, question):
 
 def store_in_cache(session_id, question , answer):
   try:
+    print(f"Looking for index: session_{session_id}")
     vector = embed(question)
     index = SearchIndex.from_existing(
       f"session_{session_id}",
-      redis_url=REDIS_URL
+      redis_client=redis_client
     )
 
     input_data = {
@@ -90,8 +91,10 @@ def store_in_cache(session_id, question , answer):
       "answer": answer,
       "vector": vector
     }
-
+    print(f"Storing in cache: {question[:50]}")
+    print(f"Vector type: {type(vector)}, length: {len(vector)}")
     index.load([input_data])
+    print(f"Store successful")
 
   except Exception as e:
     print(f"Cache store failed: {e}")

@@ -11,7 +11,8 @@ client = Anthropic(api_key=ANTHROPIC_API_KEY)
 @router.post('/session/{session_id}')
 def create_session_cache(session_id: str):
   try:
-    return create_session_index(session_id)
+    create_session_index(session_id)
+    return {"detail": f"Session {session_id} cache created"}
   except RuntimeError:
     raise HTTPException(status_code=503, detail="Redis is down")
   
@@ -33,7 +34,7 @@ def proxy_request(request: CacheRequest) -> CacheResponse:
 
   try:
     response = client.messages.create(
-      model="claude-haiku-20240307",
+      model="claude-haiku-4-5",
       max_tokens=1000,
       system=request.system or "you are a helpful assistant.",
       messages=request.messages
