@@ -46,7 +46,7 @@ def delete_session_index(session_id):
     index.delete(drop=True)
 
   except Exception as e:
-    print(f"Cache deletion failed: {e}")
+    raise RuntimeError(f"Failed to delete cache index for session {session_id}: {e}")
 
 
 def search_cache(session_id, question):

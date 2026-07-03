@@ -3,6 +3,8 @@ from pydantic import BaseModel
 class CacheRequest(BaseModel):
   session_id: str
   question: str
+  messages: list
+  system: str | None = None
 
 class CacheResponse(BaseModel):
   answer: str
