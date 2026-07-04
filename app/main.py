@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import proxy
 from contextlib import asynccontextmanager
 from prometheus_fastapi_instrumentator import Instrumentator
-from prometheus_client import Counter, Histogram
+
 
 
 @asynccontextmanager
@@ -30,9 +30,7 @@ app.add_middleware(
 
 app.include_router(proxy.router)
 
-cache_hits_total = Counter("cacheit_hits_total", "Total cache hits")
-cache_misses_total = Counter("cacheit_misses_total", "Total cache misses")
-llm_duration_seconds = Histogram("caceit_llm_duration_seconds", "LLM call duration in seconds")
+
 
 @app.get("/health")
 def health():

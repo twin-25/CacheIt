@@ -3,6 +3,8 @@ from app.services.cache_engine import store_in_cache, create_session_index, dele
 from app.config import ANTHROPIC_API_KEY
 from fastapi import APIRouter, HTTPException
 from app.models import CacheRequest, CacheResponse
+from metrics import cache_hits_total, cache_misses_total, llm_duration_seconds
+import time
 
 router = APIRouter()
 
@@ -30,9 +32,12 @@ def delete_session_cache(session_id: str):
 def proxy_request(request: CacheRequest) -> CacheResponse:
   search = search_cache(request.session_id, request.question)
   if search is not None:
+    cache_hits_total.inc()
     return CacheResponse(answer=search, cache_hit=True)
 
   try:
+    cache_misses_total.inc()
+    start = time.time()
     response = client.messages.create(
       model="claude-haiku-4-5",
       max_tokens=1000,
@@ -40,10 +45,12 @@ def proxy_request(request: CacheRequest) -> CacheResponse:
       messages=request.messages
     )
     answer = response.content[0].text
+    llm_duration_seconds.observe(time.time() - start)
   except Exception as e:
     raise HTTPException(status_code=503, detail=f"LLM call failed: {e}")
 
   store_in_cache(request.session_id, request.question, answer)
+  
 
   return CacheResponse(answer=answer, cache_hit=False)
     
