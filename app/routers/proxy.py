@@ -3,7 +3,7 @@ from app.services.cache_engine import store_in_cache, create_session_index, dele
 from app.config import ANTHROPIC_API_KEY
 from fastapi import APIRouter, HTTPException
 from app.models import CacheRequest, CacheResponse
-from metrics import cache_hits_total, cache_misses_total, llm_duration_seconds
+from app.metrics import cache_hits_total, cache_misses_total, llm_duration_seconds
 import time
 
 router = APIRouter()
