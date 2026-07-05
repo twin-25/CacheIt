@@ -43,6 +43,18 @@ Each user session gets its own isolated Redis index — answers from one session
 
 ---
 
+## Performance (Prometheus-validated, 30-request load test)
+
+| Metric | Value |
+|---|---|
+| Hit rate | 60% |
+| Avg latency — cache hit | ~127ms |
+| Avg latency — cache miss | 3.61s |
+| P95 latency — cache miss | 6s |
+| Latency reduction on hit | ~96% |
+
+*Queries validated via Prometheus. Load test: 10 unique questions × 3 rounds (miss, hit, paraphrase).*
+
 ## Threshold Validation
 
 The 0.90 similarity threshold wasn't chosen arbitrarily — it was validated against the STS (Semantic Textual Similarity) benchmark using the same embedding model used in production.
