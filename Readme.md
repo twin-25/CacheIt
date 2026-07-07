@@ -154,6 +154,26 @@ Any app calling the Anthropic API can integrate with CacheIt by pointing its bas
 
 ---
 
+## Integration with Parsit
+
+CacheIt is integrated with [Parsit](https://github.com/twin/parsit), a full stack RAG app that lets you chat with your own documents.
+
+**How it works:**
+- When a Parsit session starts, it calls `POST /session/{session_id}` to create an isolated cache index in Redis
+- Every chat request goes through CacheIt before reaching Claude
+- On a cache hit, the answer is returned instantly — no LLM call, no document retrieval
+- When the session ends, Parsit calls `DELETE /session/{session_id}` to clean up
+
+**Integration change in Parsit — one line:**
+```python
+llm = Anthropic(
+    model="claude-haiku-4-5",
+    api_key=ANTHROPIC_API_KEY,
+    base_url="http://cacheit:8000"  # ← this one line
+)
+```
+
+
 ## Project Context
 
 CacheIt is part of a two-phase AI engineering portfolio:
