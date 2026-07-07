@@ -1,10 +1,12 @@
 from pydantic import BaseModel
 
 class CacheRequest(BaseModel):
-  session_id: str
-  question: str
-  messages: list
-  system: str | None = None
+    model: str
+    messages: list
+    system: str | None = None
+    max_tokens: int = 1000
+    stream: bool = False
+    temperature: float | None = None
 
 class CacheResponse(BaseModel):
   answer: str

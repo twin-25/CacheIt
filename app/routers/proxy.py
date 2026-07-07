@@ -1,7 +1,8 @@
 from anthropic import Anthropic
 from app.services.cache_engine import store_in_cache, create_session_index, delete_session_index, search_cache
 from app.config import ANTHROPIC_API_KEY
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Header
+from typing import Optional
 from app.models import CacheRequest, CacheResponse
 from app.metrics import cache_hits_total, cache_misses_total, llm_duration_seconds
 import time
@@ -29,30 +30,43 @@ def delete_session_cache(session_id: str):
   
 
 @router.post('/v1/messages')
-def proxy_request(request: CacheRequest) -> CacheResponse:
-  search = search_cache(request.session_id, request.question)
-  if search is not None:
-    cache_hits_total.inc()
-    return CacheResponse(answer=search, cache_hit=True)
+def proxy_request(request: CacheRequest, x_session_id: Optional[str] = Header(None)):
+    question = ""
+    print(f"Full messages received: {request.messages}")
+    for msg in reversed(request.messages):
+        if msg.get("role") == "user":
+            content = msg.get("content", "")
+            if isinstance(content, list):
+                for block in content:
+                    if block.get("type") == "text":
+                        question = block.get("text", "")
+            else:
+                question = content
+            break
 
-  try:
-    cache_misses_total.inc()
-    start = time.time()
-    response = client.messages.create(
-      model="claude-haiku-4-5",
-      max_tokens=1000,
-      system=request.system or "you are a helpful assistant.",
-      messages=request.messages
-    )
-    answer = response.content[0].text
-    llm_duration_seconds.observe(time.time() - start)
-  except Exception as e:
-    raise HTTPException(status_code=503, detail=f"LLM call failed: {e}")
+    if x_session_id and question:
+        cached = search_cache(x_session_id, question)
+        if cached:
+            cache_hits_total.inc()
+            return {"content": [{"type": "text", "text": cached}]}
 
-  store_in_cache(request.session_id, request.question, answer)
-  
+    try:
+        cache_misses_total.inc()
+        start = time.time()
+        response = client.messages.create(
+            model=request.model,
+            max_tokens=request.max_tokens,
+            system=request.system or "you are a helpful assistant.",
+            messages=request.messages
+        )
+        answer = response.content[0].text
+        llm_duration_seconds.observe(time.time() - start)
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"LLM call failed: {e}")
 
-  return CacheResponse(answer=answer, cache_hit=False)
-    
+    if x_session_id and question:
+        store_in_cache(x_session_id, question, answer)
+
+    return {"content": [{"type": "text", "text": answer}]}    
   
     

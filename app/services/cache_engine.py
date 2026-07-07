@@ -69,6 +69,8 @@ def search_cache(session_id, question):
     if results:
       top_result = results[0]
       distance = float(top_result["vector_distance"])
+      print(f"Question: {question[:50]}")
+      print(f"Distance: {distance}, Threshold: {1 - SIMILARITY_THRESHOLD}")
       if distance < (1 - SIMILARITY_THRESHOLD):
         return top_result["answer"]
   except Exception:

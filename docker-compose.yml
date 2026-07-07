@@ -44,3 +44,8 @@ volumes:
   redis_data:
   prometheus_data:
   grafana_data:
+
+networks:
+  default:
+    name: cacheit-network
+    external: true
